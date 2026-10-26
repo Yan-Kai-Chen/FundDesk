@@ -1,0 +1,1 @@
+external_order_id,account_id,fund_code,side,submission_status,submitted_at,accepted_trade_date,requested_amount_cny,requested_units,payment_state,notes,bucket

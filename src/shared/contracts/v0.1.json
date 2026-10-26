@@ -1,0 +1,441 @@
+{
+  "version": "0.22.0",
+  "api_prefix": "/api/v1",
+  "numeric_contract": {
+    "input": "Decimal strings preferred; exact integers accepted; JSON floats and non-finite values rejected",
+    "output": "Money, NAV, units, fees and ratios are decimal strings or null; IDs and versions are not money",
+    "currency": "CNY",
+    "ledger_quantity_unit": "FUND_UNIT",
+    "chart_numbers": "Display conversions only; never used for financial settlement"
+  },
+  "account_modes": [
+    "demo",
+    "real"
+  ],
+  "actions": [
+    "BUY",
+    "SELL",
+    "HOLD",
+    "WAIT",
+    "BLOCKED"
+  ],
+  "value_kinds": [
+    "OFFICIAL_NAV",
+    "THIRD_PARTY_ESTIMATE",
+    "LOCAL_ESTIMATE",
+    "ETF_MARKET_PRICE",
+    "ETF_IOPV",
+    "BENCHMARK_PRICE",
+    "MANUAL_VALUE"
+  ],
+  "order_states": [
+    "SUBMITTED",
+    "ACCEPTED",
+    "PARTIALLY_CONFIRMED",
+    "CONFIRMED",
+    "CANCEL_REQUESTED",
+    "CANCELED",
+    "REJECTED"
+  ],
+  "order_fields": {
+    "requested": "BUY gross CNY or SELL units",
+    "closed": "Whether all remaining execution parts have ended",
+    "settled": "Actual received redemption CNY",
+    "paid": "Actual paid purchase CNY",
+    "bucket": "BASE or TACTICAL, default BASE for legacy input; independent of channel FIFO allocations",
+    "cash_source": "EXTERNAL for new real transactions, TRACKED for demo/explicit cash ledger. Legacy events without field replay as TRACKED. EXTERNAL paid/refunded/settled amounts cross the tracked asset boundary; no wallet balance or cash reservation.",
+    "submitted_at": "Actual platform order time; independent of initial recorded_at. BEFORE_CUTOFF uses midnight only as ordering representation.",
+    "recorded_at": "Initial local registration timestamp; retained across edits.",
+    "time_precision": "EXACT/MINUTE/DAY or BEFORE_CUTOFF. BEFORE_CUTOFF displays a before15:00 window, never an invented clock.",
+    "auto_confirm": "Defaults enabled for supported real external fund orders; demo and tracked cash unchanged.",
+    "automation": "Derived progress, expected NAV/confirmation date and AUTO_OFFICIAL_NAV basis. Not a personal bank receipt."
+  },
+  "time_contract": {
+    "timestamps": "ISO8601 with offset, normalized to UTC",
+    "business_dates": "YYYY-MM-DD; product/channel calendar; default business timezone Asia/Shanghai",
+    "time_precision_DAY": "CSV date-only facts use a midnight ordering representation and retain DAY precision; UI shows date without invented intraday time",
+    "unknown_published_at": null,
+    "display_timezone": "system preference or explicit user preference",
+    "time_precision_MINUTE": "Statement evidence only to minutes; stored seconds00 is a placeholder, displayed without seconds. Explicit ACTIVITY reference NAV date is a reconstruction assumption, not a confirmation."
+  },
+  "error_fields": [
+    "code",
+    "message",
+    "field_errors"
+  ],
+  "transaction_contract": "Write with a stable idempotency key; optimistic expected_revision for UI edits; event/cash/lot/audit replay in one SQLite transaction",
+  "import_types": [
+    "funds",
+    "observations",
+    "lots",
+    "orders",
+    "confirmations",
+    "cash_events"
+  ],
+  "reference_templates": "input/templates; rules_checklist.csv is a human verification aid, not automatic rule activation",
+  "statement_contract": {
+    "storage": "versioned documents, separate from confirmed ledger events",
+    "closed_rows": "omitted before persistence per user instruction",
+    "deduplication": "fund, literal second, side, unit and normalized Decimal; overlapping references retained",
+    "unknown_confirmations": "not posted to holdings or cash",
+    "timestamps": "literal screenshot time, interpreted as Asia/Shanghai with explicit basis",
+    "pending_settlement": "expected date is not actual cash receipt"
+  },
+  "public_nav": {
+    "supported_codes": [
+      "006810",
+      "008987",
+      "012183",
+      "012738",
+      "017954",
+      "019633",
+      "021528"
+    ],
+    "source": "Eastmoney code/name-verified chart history plus current five-row disclosure API; THS fallback on primary failure",
+    "trigger": "POST /api/v1/funds/{id}/nav/refresh",
+    "parser": "JSON literals only, never execute source JavaScript",
+    "observed_at": "actual first retrieval; historical publication times left unknown",
+    "freshness": "Cache-busting query and no-cache request headers per existing refresh. Always check bounded latest-NAV API even when a stale chart returns HTTP200. Validate prior-date identity anchors and choose current disclosure without rolling back a newer chart; supplementary failure preserves valid history and records its reason.",
+    "latest_endpoint": "https://api.fund.eastmoney.com/f10/lsjz?fundCode={verified_code}&pageIndex=1&pageSize=5",
+    "evidence": "Combined raw chart and latest JSON receipts under a stable content hash; corporate action fields retained, missing action field rejected. Unknown publication times remain null."
+  },
+  "t_attribution": {
+    "status": "Legacy conditional pairing retained for traceability and migration; primary UI uses position_buckets",
+    "methods": [
+      "RECENT_BUY_FIRST",
+      "NEXT_BUY_FIRST",
+      "MANUAL",
+      "NONE"
+    ],
+    "identity": "residual_pnl + paired T net spread = total_pnl",
+    "fees": "physical FIFO fees; economic pairing never reprices redemption fees",
+    "unpaired": "null T result, not zero profit",
+    "persistence": "versioned explicit pairs with statement and rule version guards; no ledger events",
+    "preview": "POST /api/v1/funds/{id}/t-analysis",
+    "save": "PUT /api/v1/funds/{id}/t-pairings"
+  },
+  "position_buckets": {
+    "values": [
+      "BASE",
+      "TACTICAL"
+    ],
+    "t_sell": "Consume TACTICAL first, then BASE; entire net proceeds less all consumed costs attributed to TACTICAL",
+    "base_sell": "Consume BASE only; reject insufficient available inventory",
+    "fees": "Physical channel lot fees unchanged by economic bucket classification",
+    "identity": "BASE total P&L + TACTICAL total P&L = fund total P&L",
+    "pending": "Reserve units; actual confirmations consume units; cancellation releases remaining reservation",
+    "unknown_cost": "null profit, not zero",
+    "reference": "Versioned screenshot classifications remain conditional NAV reconstruction, not confirmed ledger events",
+    "preview": "POST /api/v1/funds/{id}/bucket-analysis",
+    "save": "PUT /api/v1/funds/{id}/bucket-classification",
+    "fund_card": "Current selected fund shows its own BASE and TACTICAL market values and units; portfolio totals are labelled as totals; no frontend cost/valuation calculation"
+  },
+  "desktop": {
+    "architecture": "arm64",
+    "runtime": "Swift AppKit WKWebView + frozen Python backend",
+    "resources": "read-only app bundle; templates and frontend only",
+    "data": "existing workspace, validated by stable workspace_id; no private data in bundle",
+    "service": "loopback identity/version match; owned child exits with app, borrowed development service retained",
+    "signing": "local ad-hoc; no Developer ID or notarization"
+  },
+  "tracking_opening": {
+    "basis": "USER_ACCEPTED_RECONSTRUCTION",
+    "event": "TRACKING_OPENING; no invented channel confirmations",
+    "initial_split": "User-specified current NAV value converted to fixed units; proportional remaining economic cost",
+    "cash_scope": "Historical redemptions excluded from available cash; only later recorded cash movements enter cash",
+    "pnl": "Preserve full historical P&L and realized T; new T float shown separately",
+    "preview": "POST /api/v1/funds/{id}/tracking/preview",
+    "commit": "POST /api/v1/funds/{id}/tracking/start; proposal token, revision and explicit acceptance"
+  },
+  "daily_t": {
+    "profile_endpoint": "PUT /api/v1/funds/{id}/t-profile",
+    "levels": [
+      "OBSERVE",
+      "CAUTIOUS",
+      "BALANCED",
+      "ACTIVE"
+    ],
+    "default": "OBSERVE; no implicit preference writes",
+    "profile_fields": [
+      "level",
+      "expected_version"
+    ],
+    "snapshot": "fund.daily_t includes reference market session, today quote, profile, derived preset options and input observation ids",
+    "plan": "daily_t_items is a separate non-executable reference; no order linking or ledger writes",
+    "method": "daily-t-2026-v2: 20 to 60 strictly prior absolute NAV returns, nearest-rank P80/P60/P40, ceil 0.1pp, minimum 0.5% or twice fee cap; single budget 2%/5%/8% of current marked holding, daily gross twice single budget",
+    "fees": "Physical FIFO; block if any consumed lot rate exceeds preset cap 0%/0.5%/0.5%; T may consume base per established attribution",
+    "freshness": "Same Shanghai date only; live estimate <=900 seconds. Verified 15:00 source close and SGE 15:30 day close or date-only SHAU PM fixing remain valid for that date. Current official NAV takes precedence; previous reference date and NAV must match. Closing display never bypasses the 15:00 order cutoff.",
+    "calendar": "2026 verified CN/CN_HK/GOLD_CN reference sessions only; unknown market/year blocks. CN_HK for 012183 and 017954; CN for 021528,012738,019633. Fund subscription calendar remains distinct.",
+    "cash": "Reference gross amount only; never imply tracked cash equals channel balance",
+    "today_fields": {
+      "display_title": "今日涨跌 or 收盘涨跌",
+      "phase": "WAIT, LIVE, CLOSE, OFFICIAL",
+      "closing_label": "15:00 收盘估算 is source cutoff, not full HK session final or official NAV"
+    },
+    "display": "Header, sidebar and chart footer use fund.daily_t.today from backend; current date and source type visible. Never substitute yesterday NAV change for a missing live move. Official NAV wins; otherwise latest valid estimate, retained after close."
+  },
+  "automatic_market_data": {
+    "scope": "Verified C classes: 008987, 012183, 012738, 017954, 019633, 021528; real account while app/backend runs",
+    "manual_endpoint": "POST /api/v1/funds/{id}/market/refresh",
+    "intraday": "THS public literal minute protocol; Eastmoney JSONP fallback if available; never execute scripts; source website display switch off and endpoint undocumented",
+    "daily_nav": "Eastmoney official-disclosure series; THS disclosed NAV fallback; missing corporate-action metadata pauses rules/research",
+    "cadence": "Every 10 minutes during source sessions and after close until formal NAV. Keep checking formal NAV after 16:00 for same-day corrections. Explicit refresh bypasses interval. The current date official NAV has priority over estimates; keep closing estimate if no newer value is available.",
+    "failure": "bounded HTTPS, 5 second timeout, byte cap, no redirects, automatic retry at least 600 seconds and at most 900 seconds; failed automatic fallback cooled for 6 hours; manual requests can retry immediately",
+    "provenance": "source quote as_of distinct from observed_at/fetched_at; same minute/value deduplicated; first raw response hash retained; receipts cached under data/cache/providers",
+    "integrity": "reference date and NAV must equal stored prior official NAV; stale/future/wrong-date/identity errors do not become usable quotes; estimates do not change ledger values or realized P&L",
+    "manual_refresh": "explicit user refresh bypasses automatic interval, retry schedule and failed-fallback cooldown; active in-flight request is not duplicated; freshness/identity/source errors still apply"
+  },
+  "storage": {
+    "policy": {
+      "version": 1,
+      "intraday_days": 7,
+      "raw_response_days": 3,
+      "raw_response_cap_bytes": 20971520,
+      "unlinked_plan_days": 7,
+      "unlinked_plan_limit": 200,
+      "maintenance_interval_seconds": 3600,
+      "protected": "financial events, documents, official NAV, predictions, imports and referenced evidence"
+    },
+    "status_endpoint": "GET /api/v1/storage",
+    "cleanup_endpoint": "POST /api/v1/storage/cleanup",
+    "pinning": "Keep observations and raw receipt hashes referenced by financial events, settings, predictions, source imports, linked plans and their ancestors; keep last automatic quote per fund. Manual observations and all official NAV revisions remain.",
+    "raw_capacity": "20 MiB target for unprotected hash-named provider files; protected evidence is exempt; no symlink traversal",
+    "frontend_polling": "60-second cache reads while visible and idle; focus coalesces only when due; pause during pointer hold, scroll/resize/input and editing, resume after 1 second quiet; manual refresh/writes immediate; abort stale account requests, structurally share unchanged data",
+    "compaction": "Checkpoint WAL after cleanup; VACUUM only with at least 256 free pages and 20% free space; schema remains 3",
+    "excluded": "No automatic removal of input, output, backups, actual trades, official NAV or user preferences"
+  },
+  "asset_imports": {
+    "schema_version": 1,
+    "one_asset_per_batch": true,
+    "asset_kinds": [
+      "FUND",
+      "GOLD_FUND",
+      "GOLD_GRAM"
+    ],
+    "input_format": "CODEX_NORMALIZED_JSON",
+    "source_handling": "metadata only; original files remain outside the app import pipeline",
+    "transaction_limit": 1000,
+    "fund_position": "EXPLICIT_CURRENT_SNAPSHOT_ONLY",
+    "gold_gram": "SEPARATE_REPORTED_HOLDINGS_AND_EVIDENCE; NOT_IN_FUND_LEDGER_OR_PORTFOLIO",
+    "money_encoding": "decimal strings; missing = null; never infer shares from currency",
+    "closed_transactions": "Codex removes invalid/closed rows before submission",
+    "duplicate_rows": "normalized rows must be unique; the app does not clean them"
+  },
+  "gold_reference": {
+    "codes": [
+      "008987 C"
+    ],
+    "value_kind": "LOCAL_ESTIMATE",
+    "quality": "LOCAL_GOLD_REFERENCE",
+    "provider_id": "SGE_GOLD_REFERENCE",
+    "model_version": "shau-gold-v1",
+    "fixed_fixing_time": "date-only; as_of null; preserve actual first observed_at",
+    "scope": "GOLD_CN day reference; not gram-gold accounting",
+    "closing": "Verified current-date Au99.99 15:30 day-close point can remain visible until SHAU PM or formal NAV replaces it; preserve source clock and never use future/night placeholders."
+  },
+  "sell_profit_preview": {
+    "endpoint": "POST /api/v1/funds/{id}/sell-preview?mode=real|demo",
+    "input": "requested decimal units, bucket BASE|TACTICAL, optional occurred_at and physical allocations",
+    "read_only": true,
+    "reference": "fresh current quote when eligible, otherwise last official NAV; value kind/date/time/source retained",
+    "profit": "net receipts minus economic T-first cost; overflow base cost and all resulting sale P&L go to T",
+    "fees": "actual channel physical FIFO lots, per-lot money rounding, holding period as of requested date",
+    "comparison": "before/after at the same NAV; mark-to-reference effect separate from sell effect; realized profit is not added twice to total P&L",
+    "unknown": "unknown costs remain null; missing fee/availability/economic book blocks reliable preview",
+    "persistence": "no events, reservations, online fetches, or cached preview documents; recompute on input changes"
+  },
+  "display_summary": {
+    "total_holdings": "portfolio.return_valuation.market_value; confirmed units marked to eligible current quote or explicitly dated last official NAV",
+    "total_pnl": "portfolio.return_valuation.pnl; all realized BASE/TACTICAL P&L plus remaining holdings revalued at displayed basis",
+    "pending": "portfolio.in_transit separately displayed",
+    "font_sizes_px": [
+      16,
+      20,
+      28
+    ],
+    "font_roles": "16 text and captions; 20 titles; 28 primary values; no financial calculations in frontend"
+  },
+  "fund_sidebar": {
+    "endpoint": "PUT /api/v1/fund-sidebar?mode=real|demo",
+    "storage": "versioned fund_sidebar/catalog document; included in backup; no schema change",
+    "editable": "ordered named groups; fund display_name, group_id and observation theme",
+    "initial_groups": "technology / healthcare / broad index / gold; PCB and AI are user observation themes",
+    "new_funds": "unclassified after first custom save; never recreate deleted default groups",
+    "identity": "canonical fund identity and financial ledger unchanged; removing a category unassigns its funds",
+    "folding": "per-account local browser preferences; search temporarily reveals matches; selected fund category revealed"
+  },
+  "research_workbench": {
+    "candidate": "candidate-20261021-v01",
+    "engine_version": "0.1.0",
+    "vendor": "app/research_methods; original numerical engine/config/contracts unchanged",
+    "invocation": "explicit POST /api/v1/research/runs, immutable same-snapshot comparison; GET and page navigation never generate analyses",
+    "read": "GET /api/v1/research and GET /api/v1/research/runs/{id}",
+    "data": "six verified C funds: compact public NAV+action reconstructed total returns; 000198 daily income cash reference, last three calendar years; no wallet record",
+    "observations": "month-end 252-session cash-excess trend, 20/60-observation returns, 60-return covariance risk, 252-observation drawdown; current registered fund scope",
+    "targets": "explicit user targets and research level; reuse frozen generators/risk constraints, preserve BASE floors, no execution amounts when only reference calendar/unknown research budget",
+    "full_engine": "validated same-identity/units/NAV full research snapshot plus user-configured targets/risk and explicit independent budget; fees, lots, dealing calendar and time integrity remain required",
+    "real_defaults": "OBSERVE; unknown cash budget stays null; synthetic policy never copied into real mode",
+    "value": "minimum 60 months consistent bottom-index valuations; no NAV-to-valuation substitution; current missing series remain WAIT",
+    "retention": "latest compact research series, latest policy/input, latest 30 compressed runs with complete reproducible context; saved forecasts/resolutions remain permanent",
+    "forecast_tracking": "explicit study creation records idempotent LAST_VALUE benchmarks per fund/NAV/target-date; later official NAV resolves once; backend Decimal MAE/MAPE",
+    "independence": "no financial events, actual holdings, bucket attribution, actual orders, or T-profile writes; execution_enabled false",
+    "recommendation_reads": "GET /api/v1/recommendations/current computes read-only references; explicit legacy POST remains available",
+    "reference_calendar": "research-only SSE 2025/2026; never substituted for product dealing-calendar proof"
+  },
+  "midday_quote": {
+    "equity_estimate_source": "CN reference-session BREAK, including CN_HK products; preserve same-day verified morning estimates and original time",
+    "freshness": "extended only during lunch; strict live freshness resumes at 13:00, never carry yesterday or unknown-source quotes",
+    "collection": "fill missing morning quote during lunch; cached complete morning skips automatic polling, manual unrestricted",
+    "t_reference": "paused while source rests; gold day session independent"
+  },
+  "order_automation": {
+    "process": "POST /orders/process; exact disclosed NAV and normal T+1 local assumption, no external orders",
+    "edit": "POST /orders/{id}/edit; stable order ID, key, expected_revision or expected_order_updated_at; atomic reversal/replacement and automatic recalculation",
+    "sources": "See docs/development/AUTO_BOOKKEEPING.md; reference calendar is not promoted to a verified product dealing calendar.",
+    "cash_settlement": "Automatic calculation does not assert a bank receipt. Optional actual settlement remains distinct."
+  },
+  "day_valuation": {
+    "basis": "CURRENT_UNITS_PRICE_CHANGE",
+    "definition": "Current confirmed units * (eligible current-day reference NAV - previous trading-day official NAV); a price-impact reference, not cash-flow-adjusted actual daily income.",
+    "fund": "price_change/base_change/tactical_change/holding_value decimal strings or null; T cents = total - BASE; source and date retained.",
+    "portfolio": "total only for complete holding coverage; known_subtotal for partial coverage; NOT_OPEN and unknown are null, never zero.",
+    "writes": "Read-only snapshot projection; never changes formal P&L or ledger."
+  },
+  "manual_refresh_all": {
+    "method": "POST",
+    "path": "/api/v1/market/refresh-all?mode=real",
+    "concurrency": 3,
+    "result": "Independent COMPLETED/WAIT/FAILED/UNSUPPORTED outcomes and counts; no application lock over network; automatic ten-minute cadence unchanged."
+  },
+  "forecasting": {
+    "version": "funddesk-forecast-v1",
+    "task": "TOTAL_RETURN; 1/5 reference session horizons; NAV projection conditional on no distributions/splits",
+    "models": [
+      "ZERO",
+      "SHRUNK_MEAN20",
+      "SHRUNK_MEAN60",
+      "AR1_RIDGE120"
+    ],
+    "evaluation": "Fixed rolling prefixes; separate validation/calibration/final tests; model selected only on validation with 2% MAE improvement threshold. Public historical reconstruction, not point-in-time trading evidence.",
+    "errors": "Model ratios; resolution *_pp fields are percentage points. Scores partition by engine/fund/horizon; no mixing with old NAV errors.",
+    "endpoints": [
+      "GET /forecasting",
+      "POST /forecasting/runs",
+      "GET /forecasting/runs/{id}/export"
+    ],
+    "storage": "forecast_run maximum 10 compressed analyses, compact immutable forecast_prediction/forecast_resolution permanent; no ledger writes",
+    "automatic": "After first successful generation, App checks at least 10 minutes apart; new formal basis generates next forecasts, formal NAV plus verified research TR resolves outcomes; GET never fits or writes",
+    "scope": "Six independently verified C-class funds; demo never borrows real history; no direct trading or new wallet constraints."
+  },
+  "investment_plan": {
+    "profile": "Per-fund enabled, holding_cap, versioned DAILY_LADDER_V1 or DRAWDOWN_GUARD_V2 template and optimistic version; V2 explicitly enabled only for 021528",
+    "api": "PUT /api/v1/funds/{id}/investment-plan with enabled,holding_cap,template,expected_version",
+    "reference": "Enabled profile replaces this fund daily_t_items reference, level PLAN; profile_version is investment_plan_profile version. GET is read-only and does not create forecasts or trade records.",
+    "budget": "User-defined fund marked-holding cap, not wallet cash. Current marked units plus all unconfirmed active buy requests consume cap. Pending sells release no capacity before confirmation.",
+    "ladder": "Absolute daily change 1%/2%/3% sets cumulative directional target at holding_cap*5%/10%/15%; below1% HOLD. Subtract effective same-day T orders. Total daily two-way cap15%; do not reverse direction intraday.",
+    "sale": "Only available T units, constrained by physical available FIFO fee-free prefix. Net expected realized profit must meet max(CNY2, gross*0.5%). Same-price sell impact reused; no forced base sale or resetting base.",
+    "time": "Original quote eligibility and Beijing date/cutoff. Valid lunch/close quote may show preview-only scenario, can_apply false. Preopen, stale and missing quote have no executable amount.",
+    "execution": "Reference only. Record-already-operated opens a prefilled form and never submits or executes externally. Manual T fallback policy is unchanged.",
+    "storage": "Current small profile and up to20 user-saved history entries per fund, no per-refresh storage growth.",
+    "efficacy": "Fixed execution discipline, not fitted to maximize profit and no demonstrated repeatable excess return; forecast experimental estimates do not change tiers.",
+    "drawdown_guard_v2": {
+      "scope": "Multiday risk discipline; not a proven-return forecast or automatic trade",
+      "volatility": "Prior disclosed official returns, max 60, nearest-rank absolute-return percentile 60, at least 20 returns, minimum 1%, ceil to 0.1 percentage point",
+      "risk_states": "NORMAL / DEFENSIVE / PAUSED, separate formal close recovery; current estimate may tighten only",
+      "capital": "max(marked holding, remaining BASE + T economic cost) + active buy remainder; no wallet cash requirement",
+      "limits": "Daily cumulative 5/10/15% cap targets at h/2h/3h; defensive BUY half; rolling five reference-session buy cap 15% or 7.5%; one or two full intervening reference sessions between buying dates",
+      "sales": "Risk buy pause does not block an otherwise qualifying T-only FIFO fee-free profitable sale",
+      "storage": "Derived read-only from official history and effective order projection; no per-refresh persistence"
+    }
+  },
+  "sell_buy_comparison": {
+    "endpoint": "POST /api/v1/funds/{id}/sell-preview, optional reference_buy_order_id",
+    "selection": "Latest remaining confirmed T buy, otherwise latest remaining confirmed BASE buy; manual same-fund selection is comparison only",
+    "reference": "min(sale units, unreserved remaining purchase units); cost from current economic positions including purchase fee; rounded sale gross and fee allocated by compared units / total sale units",
+    "outputs": "buy_comparison net_price_edge / gross_price_edge / fee_share / covered_units / uncovered_units / remaining_holding_pnl / available_units; actual expected_realized_pnl and cumulative P&L unchanged",
+    "guard": "No invented unconfirmed, fully sold, future or unknown-cost purchase; new shares may be unavailable despite positive comparison; comparisons never post or get added to total P&L",
+    "ui": "Separate price comparison and original-cost realized P&L, prominent BASE fallback; plan-enabled new orders default T only when no explicit bucket or draft; existing purchase can be edited explicitly"
+  },
+  "return_valuation": {
+    "fund": "Read-only compact BucketBook summary at the eligible daily_t.today quote; current official NAV first, otherwise valid live/lunch/closing estimate, otherwise explicitly labelled last official NAV.",
+    "fields": "summary.groups/total_pnl/holding_value/total_units; label/date/as_of/value_kind/quote_id/is_estimate/current_for_date; official_total_pnl/mark_change/quote_status",
+    "portfolio": "Original formal equity and pnl plus sum of fund current holding-value minus formal holding-value, once only. Pending purchases, sales, cash and cost unchanged. Mixed basis explicitly reports last_official_count.",
+    "display": "Income panel, current BASE/T holdings, top holdings/total P&L and overview share this projection. Realized P&L changes only with confirmed events. Classification drafts keep their independent preview basis.",
+    "daily": "day_valuation is a separate current-units price-impact reference, not cash-flow-adjusted daily earnings. Never add it again to already revalued cumulative P&L.",
+    "writes": "No financial event, reservation, setting, prediction, quote or cached snapshot writes. Existing portfolio.pnl/market_value/equity and position_buckets retain formal semantics.",
+    "freshness": "Reuse daily_t eligibility; no added network polling or history storage. NOT_OPEN/stale/missing today values are not displayed as zero daily profit."
+  },
+  "holding_composition": {
+    "scope": "Read-only per-fund current marked holdings; same summary as return_valuation; no ledger or preference writes.",
+    "fields": "total value/units/cost/unrealized/realized/pnl/holding_return; BASE and TACTICAL groups with weight/pnl_weight/pnl_direction; unknown monetary values remain null.",
+    "weights": "Current group market value over total marked holdings. BASE rounded to 12 decimal places; TACTICAL is the residual so both sum to one. Empty or unknown holdings have null weights.",
+    "profit": "pnl_weight is absolute group cumulative P&L over sum of both absolute P&Ls; explicit sign and negative hatch retained. Zero net return with opposing P&L is valid; zero magnitude and unknown costs do not fabricate a chart.",
+    "return": "holding_return = current unrealized P&L / remaining cost, only for known positive cost; never divide historical realized P&L by a tiny remaining position.",
+    "display": "One total, exact BASE/T donut, amount/units/weights and floating/cumulative P&L rows, absolute P&L composition bar. Frontend only formats and maps ratios to geometry; 16/20/28px, black text, khaki BASE and blue T."
+  },
+  "daily_agenda": {
+    "endpoint": "GET /api/v1/daily-agenda",
+    "source": "One current snapshot and existing daily_t_references; no alternate rule or amount engine.",
+    "groups": "actions,needs_input,waiting,funds; normal expected confirmation is waiting, not an error.",
+    "guard": "Only can_apply references from matching current inputs; return exact requested amount/units and expiry. Cross-GET snapshot_basis must match before frontend exposes an operation. Lunch/close/expired/partial calendars are read-only.",
+    "writes": "Read-only; no network, fitting, financial events or per-refresh documents. Recording opens a prefilled form and never submits externally."
+  },
+  "holding_reconciliation": {
+    "endpoints": [
+      "GET /api/v1/reconciliations",
+      "POST /api/v1/funds/{id}/reconciliation/preview",
+      "POST /api/v1/funds/{id}/reconciliation"
+    ],
+    "scope": "User supplied channel snapshot, confirmed units excluding pending; old/historical screenshots are evidence only. Current unit comparison requires a same-Beijing-day snapshot within10minutes with no later relevant financial changes.",
+    "amounts": "Same formal NAV date; holding P&L also requires same remaining-cost basis. Unverified fee amounts are evidence only.",
+    "writes": "Explicit token-bound snapshot save only; 5 latest per fund. No holdings/financial events or balance adjustments. Later fund-specific changes mark old comparisons stale."
+  },
+  "t_review": {
+    "endpoints": [
+      "GET /api/v1/funds/{id}/t-review",
+      "POST /api/v1/funds/{id}/t-review/baseline"
+    ],
+    "exit_reference": "Sum of separate confirmed T exit references: redemption net minus same sold units held at the selected current quote. May overlap repeated cycles and is not a whole-fund alpha.",
+    "scenario": "Explicit VIRTUAL_RETAINED_PROCEEDS hypothetical comparison with same starting units, virtual cash0, and matched extra external contributions; not a wallet balance. Pending transactions defer the baseline and freeze once after all existing/new pending flows complete.",
+    "proceeds": "Confirmed proceeds are receivable; only recorded settlement makes them virtually reusable. Buy contributions and fee/unit rounding use the actual acquired shares.",
+    "guard": "Corrections to baseline prefix invalidate the comparison; unsupported flows give partial/null rather than invented precise gain.",
+    "storage": "One versioned baseline per fund and latest5 previous summaries; no financial events or recurring comparison snapshots."
+  },
+  "local_maintenance": {
+    "endpoint": "GET /api/v1/maintenance",
+    "backup": "Meaningful ledger/user-document change triggers at most1 Beijing-daily automatic snapshot while running. Retain7 daily copies; manual/update/restore backups preserved. Quote-only traffic does not trigger daily copies.",
+    "update": "Installer verifies workspace/bundle, snapshots data and archives the prior app before atomic replacement. Startup failure can revert only if ledger/schema unchanged; live authorization wait is preserved.",
+    "signing": "Optional existing Keychain identity SHA1, otherwise explicit local ad-hoc. No certificate creation, TCC changes, or promise to remove macOS permissions.",
+    "preferences": "Restore the last page, mode, selected fund and overview/detail locally; explicit fund URL opens workspace."
+  },
+  "valuation_explanation": {
+    "endpoints": [
+      "GET /api/v1/valuation-explanation",
+      "GET /api/v1/funds/{id}/valuation-explanation"
+    ],
+    "source": "Existing same-quote holding_composition and return_valuation plus original events; one read transaction.",
+    "equation": "Fund cumulative P&L = holding market value minus remaining cost plus realized. Portfolio separates other tracked items. Estimates never post to ledger.",
+    "fees": "Purchase fee is in cost and sale fee in net redemption. Fees already embedded in NAV are not deducted twice. Event history shows causes but is not an invented money-flow-adjusted daily attribution.",
+    "close_accuracy": "Collector freezes close evidence saved before the first saved verified formal value; use an earlier actual publication time when supplied, never invent it. First formal outcome retained, revisions separate. Same prior NAV required for percentage-point errors. Later quotes cannot be backfilled as earlier estimates.",
+    "storage": "At most30 compact close_estimate_result receipts per fund, independently durable beyond7day minute-cache. Repeated collection deduplicates; read requests never record results."
+  },
+  "portfolio_risk": {
+    "endpoint": "GET /api/v1/portfolio-risk",
+    "scope": "Only registered fund holdings and user-edited categories, not personal total assets or look-through holdings. Unknown valuations have known subtotal only; no fake zero/weight.",
+    "correlation": "At least20, at most60 matched start-and-end return intervals from verified total returns or corporate-action-complete formal NAV with no unhandled actions. No forward filling or forecast interpretation.",
+    "operations": "Sum only currently executable existing daily plan references; lunch/closed/expired omitted. Expiry and snapshot_basis checked by UI. No wallet constraint, trades, fitting or snapshots."
+  },
+  "plan_scenarios": {
+    "endpoint": "POST /api/v1/funds/{id}/plan-scenarios",
+    "request": "expected_version=current investment-plan version; expected_nav_id=current formal NAV id. Read-only bounded compute, no persistence or network.",
+    "paths": "Three fixed8period scenarios, scaled by initial h. Production investment_plan_reference/investment_risk/schedule/fee/FIFO/BucketBook reused.",
+    "dealing": "Hypothetical application-period NAV, actual modeled T+1 confirmation and conservative T+2 sellability per current product calendar. Unverified dates do not trade.",
+    "scope": "Current confirmed holdings and same plan. Existing pending orders remain reserved, not guessed. Partial coverage leaves complete terminal assets/P&L null. Hypothetical extra contributions are not actual wallet money. Disabled plans not auto-enabled."
+  },
+  "forecast_scorecard": {
+    "endpoint": "GET /api/v1/forecasting/scorecard",
+    "scope": "Original frozen forecast plus first formal resolution, grouped by engine/fund/1or5reference-day horizon. Duplicate opportunity revisions never double count or select the favorable result.",
+    "metrics": "Counts, MAE and zero-return baseline MAE in percentage points, recent20 resolved results. Retrospective final-test results separate. Zero prediction abstains from direction and actual flat days are excluded with explicit denominator.",
+    "unknown": "Unresolved results null, never0. Six verified experimental funds only; seventh reports not in experiment. GET does not fit, resolve or write."
+  }
+}

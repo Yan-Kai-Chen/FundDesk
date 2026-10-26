@@ -1,0 +1,61 @@
+{
+  "package": "FundDesk research methods",
+  "files": [
+    {
+      "path": "config/methods.json",
+      "bytes": 475,
+      "sha256": "c9171e3519bdfba754cea1cfc411b4fe8a2e674b0433c98208838389b7257f4c"
+    },
+    {
+      "path": "contracts/input.schema.json",
+      "bytes": 19482,
+      "sha256": "e28bb3029562ba27d8a84dad712cb63699d99b61ba42530b00b6c29bd01bffc1"
+    },
+    {
+      "path": "contracts/output.schema.json",
+      "bytes": 33981,
+      "sha256": "33b978bbf21eaea562c6d1757da1dbc8c5d75f83f91825a8e27ae0c60105b5ca"
+    },
+    {
+      "path": "engine/__init__.py",
+      "bytes": 123,
+      "sha256": "ed13e1914795b754b151bae7c0e57978fcb3c720bb4d002790c69e128e8db934"
+    },
+    {
+      "path": "engine/api.py",
+      "bytes": 8836,
+      "sha256": "b283eb79f314a20aecf8d479b96524da486bffc79cd3819a56a42c5d78b9bda2"
+    },
+    {
+      "path": "engine/contracts.py",
+      "bytes": 3405,
+      "sha256": "4970363b82dd8049d61f3ddb1345dc541cd816c8de871d07bebe5368d4bb38cb"
+    },
+    {
+      "path": "engine/domain.py",
+      "bytes": 14434,
+      "sha256": "94261060523f9d5f5ba0149862803663323aeb3e3a28e19b6372dd31cefcbde6"
+    },
+    {
+      "path": "engine/execution.py",
+      "bytes": 9227,
+      "sha256": "e0605f80e4de4262a5440b8292df56308fa1851339719030d4f54fac2a3a4874"
+    },
+    {
+      "path": "engine/models.py",
+      "bytes": 6450,
+      "sha256": "33c765d3e154c0d8f589b3967b13e118f1d3ef3dc3eaabed5459df02052ebd59"
+    },
+    {
+      "path": "engine/risk.py",
+      "bytes": 5507,
+      "sha256": "5b236dde03f26382090708851541eeff6ff62a5adf8aaeb30eeda6e67407a5cc"
+    },
+    {
+      "path": "engine/total_return.py",
+      "bytes": 1222,
+      "sha256": "91018da5488deb10a0b994e3328d6c9f63eebec4f00b50ed3b78be331d5b3232"
+    }
+  ],
+  "provenance_scope": "Integrity of included source files; original input archives are not distributed"
+}

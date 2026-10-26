@@ -1,0 +1,496 @@
+{
+  "$defs": {
+    "Asset": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "FUND",
+            "GOLD_FUND",
+            "GOLD_GRAM"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "currency": {
+          "const": "CNY",
+          "title": "Currency",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "channel": {
+          "maxLength": 60,
+          "minLength": 1,
+          "title": "Channel",
+          "type": "string"
+        },
+        "fund_code": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9]{6}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fund Code"
+        },
+        "share_class": {
+          "anyOf": [
+            {
+              "maxLength": 12,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Share Class"
+        },
+        "product_code": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Code"
+        },
+        "fund_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fund Id"
+        }
+      },
+      "required": [
+        "kind",
+        "currency",
+        "name",
+        "channel"
+      ],
+      "title": "Asset",
+      "type": "object"
+    },
+    "Nav": {
+      "additionalProperties": false,
+      "properties": {
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 40,
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        },
+        "source_refs": {
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "maxItems": 30,
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "effective_date",
+        "value",
+        "source_refs"
+      ],
+      "title": "Nav",
+      "type": "object"
+    },
+    "Position": {
+      "additionalProperties": false,
+      "properties": {
+        "snapshot_date": {
+          "format": "date",
+          "title": "Snapshot Date",
+          "type": "string"
+        },
+        "units": {
+          "maxLength": 40,
+          "minLength": 1,
+          "title": "Units",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "FUND_UNIT",
+            "GRAM"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "remaining_cost_cny": {
+          "anyOf": [
+            {
+              "maxLength": 40,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Remaining Cost Cny"
+        },
+        "reported_value_cny": {
+          "anyOf": [
+            {
+              "maxLength": 40,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reported Value Cny"
+        },
+        "base_units": {
+          "anyOf": [
+            {
+              "maxLength": 40,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Base Units"
+        },
+        "acquired_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Acquired Date"
+        },
+        "available_from": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Available From"
+        },
+        "source_refs": {
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "maxItems": 30,
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "snapshot_date",
+        "units",
+        "unit",
+        "source_refs"
+      ],
+      "title": "Position",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "filename": {
+          "maxLength": 150,
+          "minLength": 1,
+          "title": "Filename",
+          "type": "string"
+        },
+        "label": {
+          "default": "",
+          "maxLength": 80,
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sha256",
+        "filename"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "SourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "row": {
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Row",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sha256",
+        "row"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    },
+    "Transaction": {
+      "additionalProperties": false,
+      "properties": {
+        "displayed_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$",
+          "title": "Displayed At",
+          "type": "string"
+        },
+        "side": {
+          "enum": [
+            "BUY",
+            "SELL"
+          ],
+          "title": "Side",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "CNY",
+            "FUND_UNIT",
+            "GRAM"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 40,
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        },
+        "status": {
+          "default": "SHOWN",
+          "enum": [
+            "SHOWN",
+            "PENDING_SETTLEMENT"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "source_refs": {
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "maxItems": 30,
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "expected_settlement_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Settlement Date"
+        },
+        "time_precision": {
+          "anyOf": [
+            {
+              "enum": [
+                "SECOND",
+                "MINUTE"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Time Precision"
+        },
+        "original_category": {
+          "anyOf": [
+            {
+              "enum": [
+                "BUY",
+                "SELL",
+                "ACTIVITY"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Original Category"
+        },
+        "reference_nav_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Nav Date"
+        },
+        "reference_nav_date_basis": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Nav Date Basis"
+        }
+      },
+      "required": [
+        "displayed_at",
+        "side",
+        "unit",
+        "value",
+        "source_refs"
+      ],
+      "title": "Transaction",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "client_reference": {
+      "maxLength": 120,
+      "minLength": 8,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Client Reference",
+      "type": "string"
+    },
+    "asset": {
+      "$ref": "#/$defs/Asset"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "maxItems": 100,
+      "minItems": 1,
+      "title": "Sources",
+      "type": "array"
+    },
+    "transactions": {
+      "items": {
+        "$ref": "#/$defs/Transaction"
+      },
+      "maxItems": 1000,
+      "title": "Transactions",
+      "type": "array"
+    },
+    "official_navs": {
+      "items": {
+        "$ref": "#/$defs/Nav"
+      },
+      "maxItems": 1000,
+      "title": "Official Navs",
+      "type": "array"
+    },
+    "position": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Position"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "history_complete": {
+      "default": false,
+      "title": "History Complete",
+      "type": "boolean"
+    },
+    "history_completeness_basis": {
+      "default": "",
+      "maxLength": 300,
+      "title": "History Completeness Basis",
+      "type": "string"
+    },
+    "notes": {
+      "default": "",
+      "maxLength": 1000,
+      "title": "Notes",
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_reference",
+    "asset",
+    "sources"
+  ],
+  "title": "AssetDataBatch",
+  "type": "object"
+}

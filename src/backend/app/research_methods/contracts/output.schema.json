@@ -1,0 +1,1066 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "engine_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "SYNTHETIC",
+        "RESEARCH"
+      ]
+    },
+    "evidence_status": {
+      "enum": [
+        "SYNTHETIC_FUNCTIONAL_ONLY",
+        "UNVALIDATED_RESEARCH"
+      ]
+    },
+    "execution_enabled": {
+      "const": false
+    },
+    "as_of": {
+      "type": "string",
+      "minLength": 20
+    },
+    "decision_session": {
+      "type": "string",
+      "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+    },
+    "snapshot_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "snapshot_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "method_config_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "method_config_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "valid_until": {
+      "type": "string",
+      "minLength": 20
+    },
+    "dealing_date_if_applied": {
+      "type": "string",
+      "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+    },
+    "portfolio_equity_reference": {
+      "type": "string",
+      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+    },
+    "methods": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "enum": [
+              "TREND",
+              "VALUE",
+              "REBALANCE"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "analysis_status": {
+            "enum": [
+              "READY",
+              "PARTIAL",
+              "WAIT",
+              "NOT_APPLICABLE",
+              "BLOCKED"
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 0
+          },
+          "features": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "applicability": {
+                  "enum": [
+                    "APPLICABLE",
+                    "NOT_APPLICABLE"
+                  ]
+                },
+                "reasons": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 0
+                },
+                "total_return": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                },
+                "excess_vs_cash": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "selected": {
+                  "type": "boolean"
+                },
+                "expensive_percentile": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                },
+                "components": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string",
+                    "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                  }
+                },
+                "history_months": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "multiplier": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                }
+              },
+              "required": [
+                "applicability",
+                "reasons"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "raw_weights": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "target_weights": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "risk": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "TARGET_FEASIBLE",
+                      "WAIT",
+                      "BLOCKED"
+                    ]
+                  },
+                  "reasons": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 0
+                  },
+                  "current_annualized_volatility": {
+                    "type": "string",
+                    "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                  },
+                  "target_volatility_before_scaling": {
+                    "type": "string",
+                    "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                  },
+                  "target_annualized_volatility": {
+                    "type": "string",
+                    "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                  },
+                  "volatility_limit": {
+                    "type": "string",
+                    "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                  },
+                  "extra_allocation_scale": {
+                    "type": "string",
+                    "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                  },
+                  "protected_or_locked_floors": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    }
+                  },
+                  "cash_weight": {
+                    "type": "string",
+                    "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                  },
+                  "note": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "reasons"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "asset_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_weight": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                },
+                "target_weight": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                },
+                "target_band": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "signal_action": {
+                  "enum": [
+                    "INCREASE_LARGE",
+                    "INCREASE_SMALL",
+                    "HOLD",
+                    "DECREASE_SMALL",
+                    "DECREASE_LARGE",
+                    null
+                  ]
+                },
+                "execution_status": {
+                  "enum": [
+                    "REFERENCE_ONLY",
+                    "WAIT",
+                    "BLOCKED",
+                    "NOT_APPLICABLE",
+                    "HOLD"
+                  ]
+                },
+                "reasons": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 0
+                },
+                "gross_reference": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                },
+                "fee_reference": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                },
+                "units_reference": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                },
+                "net_reference": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                },
+                "reference_nav": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                },
+                "reference_nav_date": {
+                  "type": "string",
+                  "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+                },
+                "dealing_date_if_applied": {
+                  "type": "string",
+                  "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+                },
+                "price_basis": {
+                  "enum": [
+                    "LAST_OFFICIAL_NAV_REFERENCE_NOT_FILL",
+                    "SAME_DAY_ESTIMATE_SCENARIO_NOT_FILL"
+                  ]
+                },
+                "fifo_allocations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "lot_id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "units": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "holding_calendar_days": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "rate": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "gross_reference": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "fee_reference": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      }
+                    },
+                    "required": [
+                      "lot_id",
+                      "units",
+                      "holding_calendar_days",
+                      "rate",
+                      "gross_reference",
+                      "fee_reference"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 0
+                },
+                "rounding_difference_reference": {
+                  "type": "string",
+                  "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                }
+              },
+              "required": [
+                "asset_id",
+                "current_weight",
+                "target_weight",
+                "target_band",
+                "signal_action",
+                "execution_status",
+                "reasons",
+                "gross_reference",
+                "fee_reference",
+                "units_reference",
+                "net_reference",
+                "reference_nav",
+                "reference_nav_date",
+                "dealing_date_if_applied",
+                "price_basis"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0
+          },
+          "budget": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "initial_spendable_cash": {
+                    "type": "string",
+                    "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                  },
+                  "remaining_spendable_cash": {
+                    "type": "string",
+                    "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                  },
+                  "initial_turnover_budget": {
+                    "type": "string",
+                    "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                  },
+                  "remaining_turnover_budget": {
+                    "type": "string",
+                    "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                  },
+                  "sale_proceeds_reused": {
+                    "const": false
+                  },
+                  "allocation_order": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "independent_counterfactual_budget": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "initial_spendable_cash",
+                  "remaining_spendable_cash",
+                  "initial_turnover_budget",
+                  "remaining_turnover_budget",
+                  "sale_proceeds_reused",
+                  "allocation_order",
+                  "independent_counterfactual_budget"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "signal_anchor": {
+            "type": "string",
+            "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+          },
+          "analysis_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "method",
+          "label",
+          "analysis_status",
+          "reasons",
+          "features",
+          "raw_weights",
+          "target_weights",
+          "risk",
+          "items",
+          "budget",
+          "signal_anchor",
+          "analysis_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "intraday_scenario": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "NOT_REQUESTED",
+            "READY",
+            "WAIT"
+          ]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "quotes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+              },
+              "value": {
+                "type": "string",
+                "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+              },
+              "as_of": {
+                "type": "string",
+                "minLength": 20
+              },
+              "observed_at": {
+                "type": "string",
+                "minLength": 20
+              },
+              "source_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "baseline_nav_date": {
+                "type": "string",
+                "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+              },
+              "baseline_nav": {
+                "type": "string",
+                "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+              },
+              "kind": {
+                "enum": [
+                  "THIRD_PARTY_ESTIMATE",
+                  "LOCAL_ESTIMATE"
+                ]
+              },
+              "model_id": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "date",
+              "value",
+              "as_of",
+              "observed_at",
+              "source_ref",
+              "baseline_nav_date",
+              "baseline_nav",
+              "kind",
+              "model_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "methods": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "enum": [
+                  "TREND",
+                  "VALUE",
+                  "REBALANCE"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "analysis_status": {
+                "enum": [
+                  "READY",
+                  "PARTIAL",
+                  "WAIT",
+                  "NOT_APPLICABLE",
+                  "BLOCKED"
+                ]
+              },
+              "reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0
+              },
+              "features": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "applicability": {
+                      "enum": [
+                        "APPLICABLE",
+                        "NOT_APPLICABLE"
+                      ]
+                    },
+                    "reasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "minItems": 0
+                    },
+                    "total_return": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    },
+                    "excess_vs_cash": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "selected": {
+                      "type": "boolean"
+                    },
+                    "expensive_percentile": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    },
+                    "components": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      }
+                    },
+                    "history_months": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "multiplier": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    }
+                  },
+                  "required": [
+                    "applicability",
+                    "reasons"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "raw_weights": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "target_weights": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "risk": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "TARGET_FEASIBLE",
+                          "WAIT",
+                          "BLOCKED"
+                        ]
+                      },
+                      "reasons": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "minItems": 0
+                      },
+                      "current_annualized_volatility": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "target_volatility_before_scaling": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "target_annualized_volatility": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "volatility_limit": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "extra_allocation_scale": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "protected_or_locked_floors": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string",
+                          "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                        }
+                      },
+                      "cash_weight": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "note": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "reasons"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "asset_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "current_weight": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    },
+                    "target_weight": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    },
+                    "target_band": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "minItems": 2,
+                      "maxItems": 2
+                    },
+                    "signal_action": {
+                      "enum": [
+                        "INCREASE_LARGE",
+                        "INCREASE_SMALL",
+                        "HOLD",
+                        "DECREASE_SMALL",
+                        "DECREASE_LARGE",
+                        null
+                      ]
+                    },
+                    "execution_status": {
+                      "enum": [
+                        "REFERENCE_ONLY",
+                        "WAIT",
+                        "BLOCKED",
+                        "NOT_APPLICABLE",
+                        "HOLD"
+                      ]
+                    },
+                    "reasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "minItems": 0
+                    },
+                    "gross_reference": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    },
+                    "fee_reference": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    },
+                    "units_reference": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    },
+                    "net_reference": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    },
+                    "reference_nav": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    },
+                    "reference_nav_date": {
+                      "type": "string",
+                      "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+                    },
+                    "dealing_date_if_applied": {
+                      "type": "string",
+                      "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+                    },
+                    "price_basis": {
+                      "enum": [
+                        "LAST_OFFICIAL_NAV_REFERENCE_NOT_FILL",
+                        "SAME_DAY_ESTIMATE_SCENARIO_NOT_FILL"
+                      ]
+                    },
+                    "fifo_allocations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "lot_id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "units": {
+                            "type": "string",
+                            "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                          },
+                          "holding_calendar_days": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "rate": {
+                            "type": "string",
+                            "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                          },
+                          "gross_reference": {
+                            "type": "string",
+                            "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                          },
+                          "fee_reference": {
+                            "type": "string",
+                            "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                          }
+                        },
+                        "required": [
+                          "lot_id",
+                          "units",
+                          "holding_calendar_days",
+                          "rate",
+                          "gross_reference",
+                          "fee_reference"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 0
+                    },
+                    "rounding_difference_reference": {
+                      "type": "string",
+                      "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                    }
+                  },
+                  "required": [
+                    "asset_id",
+                    "current_weight",
+                    "target_weight",
+                    "target_band",
+                    "signal_action",
+                    "execution_status",
+                    "reasons",
+                    "gross_reference",
+                    "fee_reference",
+                    "units_reference",
+                    "net_reference",
+                    "reference_nav",
+                    "reference_nav_date",
+                    "dealing_date_if_applied",
+                    "price_basis"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 0
+              },
+              "budget": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "initial_spendable_cash": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "remaining_spendable_cash": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "initial_turnover_budget": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "remaining_turnover_budget": {
+                        "type": "string",
+                        "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+                      },
+                      "sale_proceeds_reused": {
+                        "const": false
+                      },
+                      "allocation_order": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "independent_counterfactual_budget": {
+                        "const": true
+                      }
+                    },
+                    "required": [
+                      "initial_spendable_cash",
+                      "remaining_spendable_cash",
+                      "initial_turnover_budget",
+                      "remaining_turnover_budget",
+                      "sale_proceeds_reused",
+                      "allocation_order",
+                      "independent_counterfactual_budget"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "signal_anchor": {
+                "type": "string",
+                "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+              },
+              "analysis_id": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "method",
+              "label",
+              "analysis_status",
+              "reasons",
+              "features",
+              "raw_weights",
+              "target_weights",
+              "risk",
+              "items",
+              "budget",
+              "signal_anchor",
+              "analysis_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "portfolio_equity_reference": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "reasons",
+        "quotes",
+        "methods",
+        "portfolio_equity_reference"
+      ],
+      "additionalProperties": false
+    },
+    "comparison": {
+      "type": "object",
+      "properties": {
+        "same_snapshot": {
+          "const": true
+        },
+        "same_constraints": {
+          "const": true
+        },
+        "amounts_are_not_additive": {
+          "const": true
+        },
+        "probability_of_rising": {
+          "type": "null"
+        },
+        "directions_by_asset": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "horizons_are_different": {
+          "const": true
+        }
+      },
+      "required": [
+        "same_snapshot",
+        "same_constraints",
+        "amounts_are_not_additive",
+        "probability_of_rising",
+        "directions_by_asset",
+        "horizons_are_different"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "engine_version",
+    "mode",
+    "evidence_status",
+    "execution_enabled",
+    "as_of",
+    "decision_session",
+    "snapshot_id",
+    "snapshot_hash",
+    "method_config_hash",
+    "method_config_version",
+    "valid_until",
+    "dealing_date_if_applied",
+    "portfolio_equity_reference",
+    "methods",
+    "intraday_scenario",
+    "comparison"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fund methods draft output",
+  "$defs": {}
+}

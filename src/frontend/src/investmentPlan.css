@@ -1,0 +1,30 @@
+.investment-plan-cap { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 14px; font-size: var(--font-caption); }
+.investment-plan-cap > strong { font-size: var(--font-title); font-weight: 550; font-variant-numeric: tabular-nums; }
+.investment-plan-space { display: flex; flex-wrap: wrap; gap: 24px; margin: 18px 0 12px; }
+.investment-plan-space > div { display: flex; flex-direction: column; gap: 6px; font-size: var(--font-caption); }
+.investment-plan-space strong { font-size: var(--font-title); font-weight: 550; font-variant-numeric: tabular-nums; }
+.investment-plan-details { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 13px; font-size: var(--font-caption); }
+.investment-plan-details summary { cursor: pointer; }
+.investment-plan-details table { margin-top: 14px; width: 100%; }
+.investment-plan-details th, .investment-plan-details td { padding: 10px 4px; font-size: var(--font-caption); }
+.investment-plan-details p { line-height: 1.75; margin: 13px 0; }
+.investment-plan-budget { margin: 14px 0; }
+.investment-plan-budget > div { display: flex; justify-content: space-between; gap: 16px; margin: 9px 0; }
+.investment-plan-budget dd { margin: 0; font-variant-numeric: tabular-nums; }
+.investment-risk-note { margin-top: 13px; line-height: 1.65; font-size: var(--font-caption); }
+.investment-risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; margin: 18px 0; }
+.investment-risk-grid > div { display: flex; flex-direction: column; gap: 8px; }
+.investment-risk-grid strong { font-size: var(--font-title); font-weight: 550; font-variant-numeric: tabular-nums; }
+.investment-risk-reasons, .investment-recovery ul { padding-left: 21px; line-height: 1.8; margin: 10px 0; }
+.investment-recovery { margin-top: 18px; padding: 14px 16px; background: var(--khaki); border-radius: 8px; }
+.investment-recovery > strong { font-size: var(--font-body); font-weight: 550; }
+.investment-record { margin-top: 7px; }
+.investment-plan-form .field { margin-top: 22px; }
+.investment-plan-template { padding: 18px; margin: 22px 0; background: var(--surface); border-radius: 9px; }
+.investment-plan-template > strong { font-size: var(--font-title); font-weight: 550; margin-right: 12px; }
+.investment-plan-template p { font-size: var(--font-body); line-height: 1.75; margin: 12px 0 18px; }
+.investment-plan-tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.investment-plan-tiers > div { display: flex; flex-direction: column; gap: 10px; padding: 14px; background: var(--blue); border-radius: 8px; font-size: var(--font-caption); }
+.investment-plan-tiers strong { font-size: var(--font-title); font-weight: 550; font-variant-numeric: tabular-nums; }
+.investment-plan-tiers > div:last-child { background: var(--khaki); }
+@media (max-width: 620px) { .investment-plan-tiers, .investment-risk-grid { grid-template-columns: 1fr; } .investment-plan-budget > div { flex-wrap: wrap; gap: 7px; } }

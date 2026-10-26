@@ -1,0 +1,163 @@
+{
+  "schema_version": "1.0",
+  "mode": "demo",
+  "notice": "独立验收夹具，所有费率与参数为合成值。测试各自定义舍入规则，不代表具体产品合同。",
+  "cases": [
+    {
+      "id": "G01_PURCHASE",
+      "input": {
+        "gross_cny": "1000.00",
+        "front_load_rate": "0.0015",
+        "nav": "1.2500"
+      },
+      "rounding": "外扣法gross/(1+rate)，净额先HALF_UP到分，手续费=gross-net；份额HALF_UP到0.01",
+      "expected": {
+        "net_cny": "998.50",
+        "fee_cny": "1.50",
+        "units": "798.80"
+      }
+    },
+    {
+      "id": "G02_FIFO",
+      "input": {
+        "sell_units": "1200.00",
+        "nav": "1.1000",
+        "lots": [
+          {
+            "id": "old",
+            "units": "1000.00",
+            "cost_cny": "1000.00",
+            "fee_rate": "0.00"
+          },
+          {
+            "id": "new",
+            "units": "500.00",
+            "cost_cny": "525.00",
+            "fee_rate": "0.015"
+          }
+        ]
+      },
+      "rounding": "FIFO；逐批毛额和费用各HALF_UP到分；移除成本按份额比例",
+      "expected": {
+        "gross_cny": "1320.00",
+        "fee_cny": "3.30",
+        "net_cny": "1316.70",
+        "removed_cost_cny": "1210.00",
+        "realized_cny": "106.70",
+        "remaining_units": "300.00",
+        "remaining_cost_cny": "315.00",
+        "remaining_value_cny": "330.00",
+        "unrealized_cny": "15.00",
+        "total_pnl_cny": "121.70"
+      }
+    },
+    {
+      "id": "G03_NET_TARGET",
+      "input": {
+        "target_net_cny": "1000.00",
+        "nav": "1.2500",
+        "redemption_rate": "0.001",
+        "unit_step": "0.01"
+      },
+      "rounding": "毛额=q*nav先HALF_UP到分，fee=gross*rate再HALF_UP到分，net=gross-fee；寻找满足净额的最少份额",
+      "expected": {
+        "minimum_units": "800.80",
+        "gross_cny": "1001.00",
+        "fee_cny": "1.00",
+        "net_cny": "1000.00",
+        "previous_units": "800.79",
+        "previous_net_cny": "999.99"
+      }
+    },
+    {
+      "id": "G04_AVAILABLE_CASH",
+      "input": {
+        "settled_cash_cny": "6000.00",
+        "reserved_unpaid_cny": "3000.00",
+        "minimum_reserve_cny": "1000.00",
+        "redemption_receivable_cny": "2000.00",
+        "buy_proposals_cny": [
+          "1500.00",
+          "1500.00"
+        ]
+      },
+      "expected": {
+        "spendable_cny": "2000.00",
+        "priority_allocation_cny": [
+          "1500.00",
+          "500.00"
+        ]
+      }
+    },
+    {
+      "id": "G05_TIMEZONE",
+      "input": {
+        "tokyo_before": "2026-10-20T15:59:00+09:00",
+        "tokyo_after": "2026-10-20T16:01:00+09:00",
+        "cutoff_shanghai": "15:00:00",
+        "open_dates": [
+          "2026-10-20",
+          "2026-10-21"
+        ]
+      },
+      "expected": {
+        "before_utc": "2026-10-20T06:59:00+00:00",
+        "before_trade_date": "2026-10-20",
+        "after_trade_date": "2026-10-21"
+      }
+    },
+    {
+      "id": "G06_CLOSED_CYCLE",
+      "input": {
+        "units": "1000.00",
+        "original_cost_cny": "1000.00",
+        "sell_nav": "1.1000",
+        "sell_rate": "0.001",
+        "later_buy_nav": "1.0500",
+        "buy_rate": "0.0015"
+      },
+      "rounding": "按同等份额补回；各现金金额HALF_UP到分；买入所需金额=q*nav*(1+buy_rate)",
+      "expected": {
+        "sell_net_cny": "1098.90",
+        "buy_outflow_cny": "1051.58",
+        "incremental_cash_cny": "47.32",
+        "sale_realized_pnl_cny": "98.90"
+      }
+    },
+    {
+      "id": "G07_SAME_DAY",
+      "input": {
+        "units": "1000.00",
+        "morning_estimate": "1.0000",
+        "afternoon_estimate": "1.0200",
+        "official_nav": "1.0100",
+        "buy_rate": "0.001",
+        "sell_rate": "0.001"
+      },
+      "rounding": "仅检验同净值日相同份额申赎的现金影响，各现金金额HALF_UP到分",
+      "expected": {
+        "buy_outflow_cny": "1011.01",
+        "sell_net_cny": "1008.99",
+        "cash_difference_cny": "-2.02",
+        "forbidden_estimate_spread_cny": "20.00"
+      }
+    },
+    {
+      "id": "G08_PENDING_ASSETS",
+      "input": {
+        "initial_cash_cny": "10000.00",
+        "paid_subscription_cny": "1000.00",
+        "confirmed_fee_cny": "1.50",
+        "confirmed_units": "798.80",
+        "nav": "1.2500"
+      },
+      "expected": {
+        "after_payment_cash_cny": "9000.00",
+        "pending_subscription_cny": "1000.00",
+        "before_confirmation_assets_cny": "10000.00",
+        "after_confirmation_fund_value_cny": "998.50",
+        "after_confirmation_assets_cny": "9998.50"
+      }
+    }
+  ]
+}

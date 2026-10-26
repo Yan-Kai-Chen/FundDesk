@@ -1,0 +1,49 @@
+name: Source checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: macos-14
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Check tracked source privacy
+        run: python3 tools/release/check_public_tree.py --tracked
+      - name: Initialize local workspace
+        run: python3 tools/dev/setup_workspace.py
+      - name: Install locked Python dependencies
+        run: |
+          python3 -m pip install uv==0.12.23
+          uv sync --project src/backend --python 3.12 --locked --group packaging
+      - name: Install locked frontend dependencies
+        run: |
+          npm install --global pnpm@11.25.0
+          pnpm --dir src/frontend install --frozen-lockfile
+      - name: Backend tests
+        working-directory: src/backend
+        run: .venv/bin/python -m pytest -c pyproject.toml ../../tests
+      - name: Frontend tests and production build
+        working-directory: src/frontend
+        run: |
+          pnpm test
+          pnpm build
+      - name: Swift policy tests
+        run: |
+          mkdir -p data/runtime/swift-test
+          xcrun swiftc -swift-version 5 src/desktop/DesktopCore.swift tests/desktop/CoreTests.swift -o data/runtime/swift-test/CoreTests
+          data/runtime/swift-test/CoreTests data/runtime/swift-test/workspace

@@ -1,0 +1,47 @@
+.holding-composition { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(175px, .8fr) minmax(0, 2.6fr); gap: 28px; margin-top: 24px; padding: 22px 24px; border: 1px solid var(--border); border-radius: 10px; background: #fff; color: #000; }
+.composition-total { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; min-width: 0; }
+.composition-total > span, .holding-composition small { font-size: var(--font-caption); line-height: 1.6; }
+.composition-total-value { font-size: var(--font-number); font-weight: 550; letter-spacing: -.4px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.composition-graphic { position: relative; width: 144px; height: 144px; margin: 7px 0 0; }
+.composition-donut { display: block; width: 100%; height: 100%; }
+.composition-donut circle { fill: none; stroke-width: 16; stroke-linecap: butt; }
+.composition-track { stroke: #f0f0f0; }
+.composition-base-stroke { stroke: #c6b58b; }
+.composition-t-stroke { stroke: #7ba5dd; }
+.composition-chart-label { position: absolute; inset: 0; display: grid; place-items: center; font-size: var(--font-caption); }
+.composition-detail { min-width: 0; }
+.composition-profit-totals { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 0 14px; }
+.composition-profit-totals > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.composition-profit-totals > div > span:first-child { flex-basis: 100%; }
+.composition-profit-totals strong, .composition-table strong { font-size: var(--font-title); font-weight: 550; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.composition-profit-totals strong small { font-weight: 400; }
+.composition-profit-totals span { font-size: var(--font-caption); }
+.composition-table-wrap { overflow-x: auto; }
+.composition-table { min-width: 505px; font-size: var(--font-caption); }
+.composition-table th { padding: 9px 10px; background: transparent; font-size: var(--font-caption); font-weight: 400; }
+.composition-table td { padding: 11px 10px; vertical-align: middle; border-top: 1px solid var(--border); border-bottom: 0; }
+.composition-table :is(th, td):first-child { padding-left: 0; }
+.composition-table :is(th, td):last-child { padding-right: 0; }
+.composition-table .numeric { text-align: right; }
+.composition-table td small { display: block; margin-top: 4px; }
+.composition-key { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 8px; }
+.composition-key.base, .composition-pnl-bar .base { background-color: #c6b58b; }
+.composition-key.tactical, .composition-pnl-bar .tactical { background-color: #7ba5dd; }
+.composition-pnl { margin-top: 15px; font-size: var(--font-caption); }
+.composition-pnl > span { display: block; margin-bottom: 8px; }
+.composition-pnl-bar { display: flex; height: 9px; border-radius: 4px; overflow: hidden; background: #f0f0f0; }
+.composition-pnl-bar > span { display: block; height: 100%; }
+.composition-pnl-bar .is-loss { background-image: repeating-linear-gradient(135deg, transparent, transparent 4px, #0005 4px, #0005 6px); }
+.composition-pnl-empty { background: #f7f7f7; padding: 7px 10px; border-radius: 5px; }
+.composition-basis { margin-top: 10px; }
+.composition-basis summary { padding: 4px 0; font-size: var(--font-caption); }
+.composition-basis p { font-size: var(--font-caption); line-height: 1.7; margin: 8px 0 0; }
+@media (max-width: 1350px) {
+  .holding-composition { grid-template-columns: 1fr; gap: 16px; }
+  .composition-total { position: relative; min-height: 110px; justify-content: center; padding-right: 130px; }
+  .composition-graphic { position: absolute; right: 0; top: -10px; width: 120px; height: 120px; margin: 0; }
+}
+@media (max-width: 700px) {
+  .holding-composition { padding: 18px 16px; }
+  .composition-profit-totals { gap: 12px; }
+}

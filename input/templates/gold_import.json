@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "client_reference": "REPLACE_WITH_UNIQUE_BATCH_ID",
+  "asset": {
+    "kind": "GOLD_GRAM",
+    "currency": "CNY",
+    "name": "",
+    "channel": "",
+    "product_code": null
+  },
+  "transactions": [],
+  "official_navs": [],
+  "position": {
+    "snapshot_date": null,
+    "units": null,
+    "unit": "GRAM",
+    "remaining_cost_cny": null,
+    "reported_value_cny": null,
+    "acquired_date": null,
+    "available_from": null,
+    "source_refs": [
+      {
+        "sha256": "",
+        "row": 1
+      }
+    ]
+  },
+  "history_complete": false,
+  "history_completeness_basis": "",
+  "notes": "",
+  "sources": [
+    {
+      "filename": "",
+      "sha256": "",
+      "label": "用户审核的本地来源"
+    }
+  ]
+}

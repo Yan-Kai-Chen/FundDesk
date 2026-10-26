@@ -1,0 +1,22 @@
+.plan-scenarios { color: #000; margin-top: 20px; }
+.plan-scenarios > summary { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 20px 24px; font-size: 20px; font-weight: 600; }
+.plan-scenarios-body { padding: 0 24px 24px; font-size: 16px; line-height: 1.6; }
+.plan-scenarios-body p { font-size: 16px; }
+.plan-scenarios-result { margin-top: 20px; }
+.plan-scenarios-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.plan-scenarios-tabs button { border: 1px solid #dedede; border-radius: 8px; padding: 8px 14px; color: #000; background: #fff; font-size: 16px; cursor: pointer; }
+.plan-scenarios-tabs button.active { background: #e8f0fc; border-color: #cadcf4; }
+.plan-scenarios-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding: 20px; background: #f4f1e9; border-radius: 12px; }
+.plan-scenarios-summary span { display: block; font-size: 16px; }
+.plan-scenarios-summary strong { display: block; margin-top: 6px; font-size: 20px; font-weight: 600; }
+.plan-scenarios-table { max-width: 100%; overflow-x: auto; }
+.plan-scenarios-table table { width: 100%; border-collapse: collapse; font-size: 16px; }
+.plan-scenarios-table th, .plan-scenarios-table td { padding: 12px 10px; border-bottom: 1px solid #e7e7e7; text-align: left; vertical-align: top; }
+.plan-scenarios-table td:not(:last-child), .plan-scenarios-table th { white-space: nowrap; }
+.plan-scenarios-table td:last-child { min-width: 180px; }
+.plan-scenarios-tag { display: block; font-size: 16px; }
+.plan-scenarios-note { margin: 14px 0; }
+.plan-scenarios-detail { margin-top: 16px; border-top: 1px solid #e7e7e7; padding-top: 16px; }
+.plan-scenarios-detail > summary { cursor: pointer; font-size: 16px; font-weight: 600; }
+.plan-scenarios-detail li { margin: 8px 0; }
+@media (max-width: 1100px) { .plan-scenarios-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

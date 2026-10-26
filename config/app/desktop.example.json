@@ -1,0 +1,7 @@
+{
+  "bundle_identifier": "local.funddesk.desktop",
+  "product_name": "FundDesk",
+  "storage": "workspace",
+  "minimum_macos": "13.0",
+  "architecture": "arm64"
+}

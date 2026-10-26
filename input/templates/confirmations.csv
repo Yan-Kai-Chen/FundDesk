@@ -1,0 +1,1 @@
+external_order_id,confirmation_external_id,confirmation_sequence,idempotency_key,event_type,nav_date,confirm_date,available_from,confirmed_nav,units_delta,gross_amount_delta_cny,fee_delta_cny,net_amount_delta_cny,is_final_for_order,source_record_ref,notes
